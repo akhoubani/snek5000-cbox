@@ -257,8 +257,12 @@
       include 'GEOM'
       include 'INPUT'
 
+      integer, parameter :: seed = 1990
+      integer :: clock
       real delta_T_side, delta_T_vert, amplitude
       real xmax, ymax, ran
+      integer, allocatable :: seed_array(:)
+      integer :: seed_size
 
       delta_T_side = abs(UPARAM(5))
       delta_T_vert = abs(UPARAM(6))
@@ -297,8 +301,19 @@
          uy = 0.0
          uz = 0.0
 
+         call random_seed(size = seed_size)
+         allocate(seed_array(seed_size))
+
+         call system_clock(count=clock)
+         seed_array = seed + clock
+
+         call random_seed(put = seed_array)
+         deallocate(seed_array)
+
          call random_number(temp)
          temp = amplitude * temp
+
+
          endif
 
       return
@@ -336,6 +351,7 @@
 
       ! stretch factors
          stretch_x = stretch_y*xmax
+         ! stretch_x = 0
          if (if3d) then
              stretch_z = stretch_y*zmax
          endif
